@@ -49,6 +49,7 @@ class BinarySearchTree {
     if (newNode.val < root.val) {
       // 新节点比根节点小，左子树
       if (root.left === null) {
+        // 如果左子树上没有内容，则直接插入，如果有，寻找下一个插入位置
         root.left = newNode
         root.left.parent = root
       } else {
@@ -64,6 +65,47 @@ class BinarySearchTree {
       }
     }
   }
+  /**
+   * 根据 val 查找节点
+   * @param {number} val 需要查找的数值
+   * @returns 如果找到返回当前节点的引用，如果未找到返回 undefined
+   */
+  find(val) {
+    if (typeof val !== 'number') throw Error('插入的值不是一个数字')
+    let node = this.root
+    while (node) {
+      if (node.val < val) {
+        // 进入右子树
+        node = node.right
+      } else if (node.val > val) {
+        // 进入左子树
+        node = node.left
+      } else {
+        return node
+      }
+    }
+    return
+  }
+  // /**
+  //  * 根据 val 查找节点 递归版
+  //  * @param {number} val 需要查找的数值
+  //  * @returns 如果找到返回当前节点的引用，如果未找到返回 undefined
+  //  */
+  // find(val) {
+  //   if (typeof val !== 'number') throw Error('插入的值不是一个数字')
+  //   function r(node, val) {
+  //     // console.log(node)
+  //     if (!node) return
+  //     if (node.val < val) {
+  //       return r(node.right, val)
+  //     } else if (node.val > val) {
+  //       return r(node.left, val)
+  //     } else {
+  //       return node
+  //     }
+  //   }
+  //   return r(this.root, val)
+  // }
   // 中序遍历这个树
   static inorder(root) {
     if (!root) return
@@ -92,4 +134,5 @@ const tree = new BinarySearchTree()
 tree.insertNode([71, 35, 87, 22, 53, 46, 66, 78, 98])
 
 const arr = BinarySearchTree.inorder(tree.root)
-console.log(arr) // [ 22, 35, 46, 53, 66,71, 78, 87, 98 ]
+// console.log(arr) // [ 22, 35, 46, 53, 66,71, 78, 87, 98 ]
+console.log(tree.find(35))
