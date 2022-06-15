@@ -169,6 +169,7 @@ class BinarySearchTree {
       parent.right = null
     }
   }
+  // 查找最小值
   #minNode(node) {
     if (!node) return
     if (!node.left) return node
@@ -203,11 +204,8 @@ class BinarySearchTree {
 }
 const tree = new BinarySearchTree()
 
-tree.insertNode([71, 35, 80, 22, 53, 46, 66, 81, 82, 83, 88, 98])
+tree.insertNode([71, 35, 84, 22, 53, 46, 66, 81, 83, 82, 88, 98])
 
-console.log(BinarySearchTree.inorder(tree.root)) // [ 22, 35, 46, 53, 66,71, 78, 87, 98 ]
+console.log(BinarySearchTree.inorder(tree.root)) // [ 22, 35, 46, 53, 66, 71, 81, 82, 83, 84, 88, 98 ]
 tree.remove(71)
-console.log(BinarySearchTree.inorder(tree.root)) // [ 22, 35, 46, 53, 66,71, 78, 87, 98 ]
-// tree.remove(35)
-// console.log(BinarySearchTree.inorder(tree.root)) // [ 22, 35, 46, 53, 66,71, 78, 87, 98 ]
-// console.log(tree.find(35))
+console.log(BinarySearchTree.inorder(tree.root)) // [ 22, 35, 46, 53, 66, 81, 82, 83, 84, 88, 98 ]
