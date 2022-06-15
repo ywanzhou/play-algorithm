@@ -106,6 +106,30 @@ class BinarySearchTree {
   //   }
   //   return r(this.root, val)
   // }
+  remove(val) {
+    // 1. 删除节点
+    const cur = this.find(val)
+    if (!val) return false // 未找到需要删除的节点
+
+    // 1. 当前节点是叶子节点的情况
+    if (!cur.left && !cur.right) {
+      this.#removeLeaf(cur)
+    }
+  }
+  // 删除叶子节点
+  #removeLeaf(node) {
+    if (!node) return
+    const parent = node.parent
+    if (node.val < parent.val) {
+      // 当前要删除的叶子节点是左节点
+      parent.left = null
+      node.parent = null
+    } else {
+      // 当前要删除的叶子节点是右节点
+      parent.right = null
+      node.parent = null
+    }
+  }
   // 中序遍历这个树
   static inorder(root) {
     if (!root) return
@@ -133,6 +157,7 @@ const tree = new BinarySearchTree()
 
 tree.insertNode([71, 35, 87, 22, 53, 46, 66, 78, 98])
 
-const arr = BinarySearchTree.inorder(tree.root)
-// console.log(arr) // [ 22, 35, 46, 53, 66,71, 78, 87, 98 ]
-console.log(tree.find(35))
+console.log(BinarySearchTree.inorder(tree.root)) // [ 22, 35, 46, 53, 66,71, 78, 87, 98 ]
+tree.remove(66)
+console.log(BinarySearchTree.inorder(tree.root)) // [ 22, 35, 46, 53, 66,71, 78, 87, 98 ]
+// console.log(tree.find(35))
