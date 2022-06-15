@@ -111,9 +111,50 @@ class BinarySearchTree {
     const cur = this.find(val)
     if (!val) return false // 未找到需要删除的节点
 
-    // 1. 当前节点是叶子节点的情况
     if (!cur.left && !cur.right) {
+      // 1. 当前节点是叶子节点的情况
       this.#removeLeaf(cur)
+    } else if (cur.left && cur.right) {
+      // 2. 当前节点存在两个子节点
+      // 2.1 找到当前节点的后继节点
+      const successorNode = this.#minNode(cur.right)
+      // 2.2 将后继节点的值赋值给当前值
+      cur.val = successorNode.val
+      if (!successorNode.left && !successorNode.right) {
+        // 2.3 后继节点是叶子节点，直接删除
+        this.#removeLeaf(successorNode)
+      } else {
+        // 2.4 后继节点不是叶子节点
+        // 2.4.1记录该节点的子节点，
+        let child =
+          successorNode.left !== null ? successorNode.left : successorNode.right
+        // 2.4.2 记录该节点的父节点
+        let parent = successorNode.parent
+        // 2.4.3 如果当前父节点的left是后继结点，则把后继结点的父节点的left指向后继结点的子节点
+        if (parent.left === successorNode) {
+          parent.left = child
+        } else {
+          // 2.4.4 如果不是，则让父节点的right指向后继结点的子节点
+          parent.right = child
+        }
+        // 2.4.5 修改子节点的parent指针
+        child.parent = parent
+      }
+
+      // 2.3 删除后继节点
+    } else {
+      // 记录当前节点的是否是父节点的左子树
+      const isLeft = cur.val < cur.parent.val
+      // 3. 仅存在一个子节点
+      if (cur.left) {
+        // 3.1 当前节点存在左子树
+        cur.parent[isLeft ? 'left' : 'right'] = cur.left
+        cur.left.parent = cur.parent
+      } else if (cur.right) {
+        // 3.2 当前节点存在右子树
+        cur.parent[isLeft ? 'left' : 'right'] = cur.right
+        cur.right.parent = cur.parent
+      }
     }
   }
   // 删除叶子节点
@@ -123,12 +164,19 @@ class BinarySearchTree {
     if (node.val < parent.val) {
       // 当前要删除的叶子节点是左节点
       parent.left = null
-      node.parent = null
     } else {
       // 当前要删除的叶子节点是右节点
       parent.right = null
-      node.parent = null
     }
+  }
+  #minNode(node) {
+    if (!node) return
+    if (!node.left) return node
+    let p = node.left
+    while (p.left) {
+      p = p.left
+    }
+    return p
   }
   // 中序遍历这个树
   static inorder(root) {
@@ -155,9 +203,11 @@ class BinarySearchTree {
 }
 const tree = new BinarySearchTree()
 
-tree.insertNode([71, 35, 87, 22, 53, 46, 66, 78, 98])
+tree.insertNode([71, 35, 80, 22, 53, 46, 66, 81, 82, 83, 88, 98])
 
 console.log(BinarySearchTree.inorder(tree.root)) // [ 22, 35, 46, 53, 66,71, 78, 87, 98 ]
-tree.remove(66)
+tree.remove(71)
 console.log(BinarySearchTree.inorder(tree.root)) // [ 22, 35, 46, 53, 66,71, 78, 87, 98 ]
+// tree.remove(35)
+// console.log(BinarySearchTree.inorder(tree.root)) // [ 22, 35, 46, 53, 66,71, 78, 87, 98 ]
 // console.log(tree.find(35))
