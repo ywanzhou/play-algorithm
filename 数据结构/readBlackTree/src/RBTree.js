@@ -1,36 +1,35 @@
-class RBTree {
-  constructor() {
-    this.root = null
-  }
-
-  static RED = 'RED'
-  static BLACK = 'BLACK'
-
+const RED = 'RED'
+const BLACK = 'BLACK'
+class RBNode {
   /**
    * 创建一个新的节点
    * @author ywanzhou
    * @param {number} val 要插入的数值
-   * @param {Node} parent 父节点
-   * @param {Node} left 左子树
-   * @param {Node} right 右子树
+   * @param {RBNode} parent 父节点
+   * @param {RBNode} left 左子树
+   * @param {RBNode} right 右子树
    * @param {string} color 颜色
    * @returns 一个新的节点
    */
-  static createNode(val, parent, left, right, color) {
-    if (color !== this.RED && color !== this.BLACK)
+  constructor(val, parent, left, right, color = RED) {
+    if (color !== RED && color !== BLACK)
       throw new Error('color can only be RED or BLACK')
-    return {
-      val,
-      parent,
-      left,
-      right,
-      color,
-    }
+    this.val = val
+    this.parent = parent
+    this.left = left
+    this.right = right
+    this.color = color
+  }
+}
+
+class RBTree {
+  constructor() {
+    this.root = null
   }
   /**
    * 给定一个节点，修改节点的颜色 这是一个私有方法
    * @author ywanzhou
-   * @param {Node} node 需要改变的颜色
+   * @param {RBNode} node 需要改变的颜色
    * @param {string} color 需要节点改变后的颜色
    */
   #changeColor(node, color) {
@@ -47,7 +46,7 @@ class RBTree {
    *           / \          ->       /  \
    *          cl  cr        ->      pl   cl
    * @author ywanzhou
-   * @param {Node} node 需要旋转的节点
+   * @param {RBNode} node 需要旋转的节点
    */
   #leftRotate(node) {
     if (!node) return
@@ -85,7 +84,7 @@ class RBTree {
    *        /  \            ->           / \
    *       cl   cr          ->          cr  pr
    * @author ywanzhou
-   * @param {Node} node 需要旋转的节点
+   * @param {RBNode} node 需要旋转的节点
    */
   #rightRotate(node) {
     if (!node) return
@@ -116,5 +115,16 @@ class RBTree {
     l.right = node
     // 4.1 重新建立parent引用
     node.parent.l
+  }
+  /**
+   * 往红黑树中插入一个节点
+   * @param {number} val 要插入的值
+   */
+  insert(val) {
+    let t = this.root
+    // 情况一：红黑树中不存在任何节点，插入收据后直接作为根节点
+    if (t === null) {
+      this.root = this.createNode(val)
+    }
   }
 }
