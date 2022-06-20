@@ -9,7 +9,7 @@ class RBNode {
    * @param {RBNode} left 左子树
    * @param {RBNode} right 右子树
    * @param {string} color 颜色
-   * @returns 一个新的节点
+   * @returns {RBNode} 一个新的节点
    */
   constructor(val, parent, left = null, right = null, color = RED) {
     if (color !== RED && color !== BLACK)
@@ -299,25 +299,29 @@ class RBTree {
   }
 }
 /**
- * 先序遍历红黑树，打印结果，查看插入操作是否正确
+ * 中序遍历红黑树，打印结果，查看插入操作是否正确
  * @param {RBNode} root
  * @param {number} deep
  * @returns
  */
-function test(root, deep = 1) {
+function preorder(root, deep = 1) {
   if (!root) return
   let tab = ''
-  for (let i = 0; i < deep; i++) {
+  for (let i = 1; i < deep; i++) {
     tab += '\t'
   }
-  console.log(tab + root.val + root.color[0])
-  root.left && test(root.left, deep + 1)
-  root.right && test(root.right, deep + 1)
+  root.left && preorder(root.left, deep + 1)
+  console.log(
+    '%c' + tab + root.val,
+    root.color[0] === 'R' ? 'color:red' : 'color:black'
+  )
+  root.right && preorder(root.right, deep + 1)
 }
 const tree = new RBTree()
 let arr = [2, 3, 4, 5, 6, 7, 8, 9, 10, 1]
 arr.forEach(v => {
+  console.log(`------插入数据${v}------`)
   tree.insert(v)
-  test(tree.root)
-  console.log('------------')
+  preorder(tree.root)
+  console.log('--------------------')
 })
