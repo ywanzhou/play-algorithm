@@ -23,8 +23,17 @@ class RBNode {
 }
 
 class RBTree {
-  constructor() {
+  /**
+   * @author ywanzhou
+   * @param {number[]} list 创建对象时节点中的数据
+   */
+  constructor(list) {
     this.root = null
+    if (Object.prototype.toString.call(list) === '[object Array]') {
+      list.forEach(v => {
+        this.insert(v)
+      })
+    }
   }
   /**
    * 给定一个节点，修改节点的颜色 这是一个私有方法
@@ -306,7 +315,7 @@ class RBTree {
   findNode(val) {
     if (typeof val !== 'number') throw new TypeError('val is not a number')
     let p = this.root
-    while (p !== null) {
+    while (p) {
       switch (true) {
         case p.val < val:
           p = p.right
@@ -321,6 +330,19 @@ class RBTree {
       }
     }
     return null
+  }
+  /**
+   * 根据 val 删除红黑树中的节点
+   * @author ywanzhou
+   * @param {number} val 要删除的节点的值
+   * @returns {RBNode} 删除的节点
+   */
+  remove(val) {
+    const node = this.findNode(val)
+    if (!node) {
+      return null
+    }
+    return node
   }
 }
 /**
@@ -342,13 +364,13 @@ function preorder(root, deep = 1) {
   )
   root.right && preorder(root.right, deep + 1)
 }
-const tree = new RBTree()
 let arr = [2, 3, 4, 5, 6, 7, 8, 9, 10, 1]
-arr.forEach(v => {
-  console.log(`------插入数据${v}------`)
-  tree.insert(v)
-  preorder(tree.root)
-  console.log('--------------------')
-})
-const n = tree.findNode(8)
+const tree = new RBTree(arr)
+// arr.forEach(v => {
+//   console.log(`------插入数据${v}------`)
+//   tree.insert(v)
+//   preorder(tree.root)
+//   console.log('--------------------')
+// })
+const n = tree.remove(8)
 console.log(n)
