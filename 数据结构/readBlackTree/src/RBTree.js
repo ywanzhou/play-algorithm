@@ -297,6 +297,31 @@ class RBTree {
   #getColor(node) {
     return node === null ? BLACK : node.color
   }
+  /**
+   * 根据val查找指定节点
+   * @author ywanzhou
+   * @param {number} val 要查找的节点的值
+   * @returns {RBNode} 找到的节点
+   */
+  findNode(val) {
+    if (typeof val !== 'number') throw new TypeError('val is not a number')
+    let p = this.root
+    while (p !== null) {
+      switch (true) {
+        case p.val < val:
+          p = p.right
+          break
+        case p.val > val:
+          p = p.left
+        case p.val === val:
+          return p
+
+        default:
+          break
+      }
+    }
+    return null
+  }
 }
 /**
  * 中序遍历红黑树，打印结果，查看插入操作是否正确
@@ -325,3 +350,5 @@ arr.forEach(v => {
   preorder(tree.root)
   console.log('--------------------')
 })
+const n = tree.findNode(8)
+console.log(n)
