@@ -373,4 +373,5 @@ const tree = new RBTree(arr)
 //   console.log('--------------------')
 // })
 const n = tree.remove(8)
+
 console.log(n)
