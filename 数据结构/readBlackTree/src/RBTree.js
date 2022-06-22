@@ -316,20 +316,15 @@ class RBTree {
     if (typeof val !== 'number') throw new TypeError('val is not a number')
     let p = this.root
     while (p) {
-      switch (true) {
-        case p.val < val:
-          p = p.right
-          break
-        case p.val > val:
-          p = p.left
-        case p.val === val:
-          return p
-
-        default:
-          break
+      if (val < p.val) {
+        p = p.left
+      } else if (val > p.val) {
+        p = p.right
+      } else {
+        break
       }
     }
-    return null
+    return p
   }
   /**
    * 查找node的前驱节点
@@ -351,6 +346,31 @@ class RBTree {
       let p = node.parent
       let c = node
       while (p.left === c && p) {
+        c = p
+        p = p.parent
+        return p
+      }
+      return null
+    }
+  }
+  /**
+   * 查找node的后继节点
+   * @author ywanzhou
+   * @param {RBNode} node
+   * @returns {RBNode} 后继节点
+   */
+  sucessor(node) {
+    if (!node) return null
+    else if (node.right) {
+      let p = node.right
+      while (p.left) {
+        p = p.left
+      }
+      return p
+    } else {
+      let p = node.parent
+      let c = node
+      while (p.right === c && p) {
         c = p
         p = p.parent
         return p
@@ -402,4 +422,7 @@ const tree = new RBTree(arr)
 // const n = tree.remove(8)
 
 // console.log(n)
-// console.log(tree.predecessor(tree.findNode(6)))
+// preorder(tree.root)
+let node4 = tree.findNode(4)
+let s = tree.sucessor(node4)
+console.log(s)
