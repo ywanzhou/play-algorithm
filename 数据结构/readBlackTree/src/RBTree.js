@@ -332,6 +332,33 @@ class RBTree {
     return null
   }
   /**
+   * 查找node的前驱节点
+   * @author ywanzhou
+   * @param {RBNode} node
+   * @returns {RBNode} 前驱节点
+   */
+  predecessor(node) {
+    if (!node) return null
+    else if (node.left) {
+      let p = node.left
+      while (p.right) {
+        p = p.right
+      }
+      return p
+    } else {
+      // 如果删除寻找前驱节点是保证左右子树都存在的时候才找前驱或者后继
+      // 这里的 else 只是为了寻找节点的前驱节点
+      let p = node.parent
+      let c = node
+      while (p.left === c && p) {
+        c = p
+        p = p.parent
+        return p
+      }
+      return null
+    }
+  }
+  /**
    * 根据 val 删除红黑树中的节点
    * @author ywanzhou
    * @param {number} val 要删除的节点的值
@@ -372,6 +399,7 @@ const tree = new RBTree(arr)
 //   preorder(tree.root)
 //   console.log('--------------------')
 // })
-const n = tree.remove(8)
+// const n = tree.remove(8)
 
-console.log(n)
+// console.log(n)
+// console.log(tree.predecessor(tree.findNode(6)))
