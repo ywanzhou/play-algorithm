@@ -382,14 +382,78 @@ class RBTree {
    * 根据 val 删除红黑树中的节点
    * @author ywanzhou
    * @param {number} val 要删除的节点的值
-   * @returns {RBNode} 删除的节点
+   * @returns {number} 删除的节点中的val值
    */
   remove(val) {
     const node = this.findNode(val)
     if (!node) {
       return null
     }
-    return node
+    const oldVal = node.val
+    // 删除节点
+    this.deleteNode(node)
+    return oldVal
+  }
+  /**
+   *
+   * @param {RBNode} node 要删除的节点
+   */
+  deleteNode(node) {
+    // 删除的节点是根节点，直接将 root 置为 null
+    if (node.parent === null) {
+      this.root = null
+    }
+    // 删除节点
+    // 1 存在左右子树的情况
+    if (node.left && node.right) {
+      // 1.1 找到前驱或者后继节点
+      const sucessor = this.sucessor(node)
+      // 1.2 将我们找到节点的值赋值给要被删除的节点
+      node.val = sucessor.val
+      // 1.3 将 node 指向后继节点，删除 node 即可（也就是删除前驱或者后继）
+      node = sucessor
+    }
+    // 2 找到替换节点
+    // 如果前面使用前驱节点则存在左子树，后继存在右子树，这里这么写可以兼容前驱或者后继
+    let replacement = node.left ? node.left : node.right
+    if (replacement) {
+      // 2.1 说明存在左子树或者右子树，则不是叶子节点
+      // 2.1.1 将 replacement 的 parent 指向 node 的 parent（认爹）
+      replacement.parent = node.parent
+      // 2.1.2 建立 left 或者 right 的引用（认儿子）
+      if (node.parent.left === node) {
+        node.parent.left = replacement
+      } else {
+        node.parent.right = replacement
+      }
+      // 2.1.3 清空node节点的所有指针（抛弃了所有人，等待被垃圾机制回收）
+      node.left = null
+      node.right = null
+      node.parent = null
+
+      // 2.1.4 调整红黑树的平衡
+      if (this.#getColor(node) === BLACK) {
+        // 只有删除黑色节点才需要调整平衡
+        // #fixAfterDeleteNode(replacement) // 基于前驱或者后继节点进行调整
+      }
+    }
+    // 3 删除叶子节点
+    else {
+      // 3.1 说明不存在前驱或者后继，也就是叶子节点
+      if (this.#getColor(node) === BLACK) {
+        // 3.2 如果叶子节点是黑色，则需要调整红黑树的平衡
+        // #fixAfterDeleteNode(node)
+      }
+      // 3.3 删除叶子节点
+      // 3.3.1 不认儿子
+      if (node.parent.left === node) {
+        node.parent.left = null
+      } else if (node.parent.right === node) {
+        node.parent.right = null
+      }
+      // 3.3.2 不认老爹
+      node.parent = null
+    }
   }
 }
 /**
