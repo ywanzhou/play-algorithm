@@ -434,6 +434,13 @@ class RBTree {
       // 2.1.4 调整红黑树的平衡
       if (this.#getColor(node) === BLACK) {
         // 只有删除黑色节点才需要调整平衡
+        /**
+         * 这里的replacement节点一定是红色，原因：
+         * 红黑树中删除的节点对应 2-3-4 树中的叶子节点
+         * 叶子节点只存在三种情况，也就是2节点3节点和4节点
+         * 如果是2节点，则 replacement 不存在
+         * 如果是3或者4节点，则 replacement 一定为红色节点
+         */
         // #fixAfterDeleteNode(replacement) // 基于前驱或者后继节点进行调整
       }
     }
