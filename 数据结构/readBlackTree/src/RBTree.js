@@ -399,10 +399,6 @@ class RBTree {
    * @param {RBNode} node 要删除的节点
    */
   deleteNode(node) {
-    // 删除的节点是根节点，直接将 root 置为 null
-    if (node.parent === null) {
-      this.root = null
-    }
     // 删除节点
     // 1 存在左右子树的情况
     if (node.left && node.right) {
@@ -412,6 +408,10 @@ class RBTree {
       node.val = sucessor.val
       // 1.3 将 node 指向后继节点，删除 node 即可（也就是删除前驱或者后继）
       node = sucessor
+    }
+    // 1.1 删除的节点是根节点，直接将 root 置为 null
+    if (node.parent === null) {
+      this.root = null
     }
     // 2 找到替换节点
     // 如果前面使用前驱节点则存在左子树，后继存在右子树，这里这么写可以兼容前驱或者后继
@@ -441,7 +441,7 @@ class RBTree {
          * 如果是2节点，则 replacement 不存在
          * 如果是3或者4节点，则 replacement 一定为红色节点
          */
-        // #fixAfterDeleteNode(replacement) // 基于前驱或者后继节点进行调整
+        this.#fixAfterDeleteNode(replacement) // 基于前驱或者后继节点进行调整
       }
     }
     // 3 删除叶子节点
@@ -449,7 +449,7 @@ class RBTree {
       // 3.1 说明不存在前驱或者后继，也就是叶子节点
       if (this.#getColor(node) === BLACK) {
         // 3.2 如果叶子节点是黑色，则需要调整红黑树的平衡
-        // #fixAfterDeleteNode(node)
+        this.#fixAfterDeleteNode(node)
       }
       // 3.3 删除叶子节点
       // 3.3.1 不认儿子
@@ -462,6 +462,93 @@ class RBTree {
       node.parent = null
     }
   }
+  /**
+   * 删除时调整树结构
+   * @param {RBNode} x
+   */
+  #fixAfterDeleteNode(x) {
+    // 1. 如果 x 节点不是根节点且颜色时黑色
+    while (x !== this.root && this.#getColor(x) === BLACK) {
+      // x 是左孩子，也就是使用前驱节点替换
+      if (x == this.#getLeft(this.#getParent(x))) {
+        // 1.1 寻找兄弟节点
+        let rNode = this.#getRight(this.#getParent(x))
+        // 1.1.1 如果兄弟节点为红色，则说明它不是真正的兄弟节点
+        if (this.#getColor(rNode) === RED) {
+          // 1.1.2 将该节点染黑 父节点染红
+          this.#setColor(rNode, BLACK)
+          this.#setColor(this.#getParent(rNode), RED)
+          // 1.1.3 将x节点的父节点左旋
+          this.#leftRotate(this.#getParent(x))
+          // 1.1.4 找到真正的兄弟节点
+          rNode = this.#getRight(this.#getParent(x))
+        }
+        // 1.2 x 节点转换为2-3-4树，对应的兄弟节点为3节点或者4节点的情况
+        if (this.#getLeft(rNode) !== null || this.#getRight(rNode) !== null) {
+          // 如果存在左子树或者右子树则说明转换为2-3-4树为3节点或者4节点
+          // 1.2.1 判断是否存在左子树，如果存在则变色旋转
+          // 1.2.1.1 因为进入这个说明左右子树必须存在一个，如果右子树不存在则说明左子树一定存在
+          if (this.#getRight(rNode) === null) {
+            // 1.2.1.2 说明存在，先将左子树变黑
+            this.#setColor(this.#getLeft(rNode), BLACK)
+            // 1.2.1.3 将原本的黑色节点变红
+            this.#setColor(rNode, RED)
+            // 1.2.1.4 右旋
+            this.#rightRotate(rNode)
+            // 1.2.1.5 调整rNode
+            rNode = this.#getRight(this.#getParent(x))
+          }
+          // 1.2.2 将兄弟节点变成父亲的颜色
+          this.#setColor(rNode, this.#getColor(this.#getParent(x)))
+          // 1.2.3 将父节点变成黑色
+          this.#setColor(this.#getParent(x), BLACK)
+          // 1.2.4 将兄弟节点的右节点变成黑色
+          this.#setColor(this.#getRight(rNode), BLACK)
+          // 1.2.5 沿着 x 节点的父节点进行左旋
+          this.#leftRotate(this.#getParent(x))
+          // 1.2.6 跳出循环
+          break
+        }
+        // 1.3 x 节点转换为2-3-4树，对应的兄弟节点为2节点
+        else {
+          // 1.3.1 将兄弟节点变成红色
+          this.#setColor(rNode, RED)
+          // 1.3.2 移动x递归变色
+          x = this.#getParent(x)
+          // 1.3.3 如果 x 的节点不为黑色，则不会进入循环，而是执行 2 将其变成黑色，然后黑色继续保存平衡
+        }
+      }
+      // x 是右孩子，也就是使用后继节点替换
+      else {
+        // 代码与上面一致，只是方向换了一下，为了兼容前驱和后继节点
+        let lNode = this.#getLeft(this.#getParent(x))
+        if (this.#getColor(lNode) === RED) {
+          this.#setColor(lNode, BLACK)
+          this.#setColor(this.#getParent(lNode), RED)
+          this.#rightRotate(this.#getParent(x))
+          lNode = this.#getLeft(this.#getParent(x))
+        }
+        if (this.#getLeft(lNode) !== null || this.#getRight(lNode) !== null) {
+          if (this.#getLeft(lNode) === null) {
+            this.#setColor(this.#getRight(lNode), BLACK)
+            this.#setColor(lNode, RED)
+            this.#leftRotate(lNode)
+            lNode = this.#getLeft(this.#getParent(x))
+          }
+          this.#setColor(lNode, this.#getColor(this.#getParent(x)))
+          this.#setColor(this.#getParent(x), BLACK)
+          this.#setColor(this.#getLeft(lNode), BLACK)
+          this.#rightRotate(this.#getParent(x))
+          break
+        } else {
+          this.#setColor(lNode, RED)
+          x = this.#getParent(x)
+        }
+      }
+    }
+    // 2. 替换节点为x，也就是 deleteNode 中的 2.4.1 中的调用
+    this.#setColor(x, BLACK)
+  }
 }
 /**
  * 中序遍历红黑树，打印结果，查看插入操作是否正确
@@ -469,31 +556,43 @@ class RBTree {
  * @param {number} deep
  * @returns
  */
-function preorder(root, deep = 1) {
+function inorder(root, deep = 1) {
   if (!root) return
   let tab = ''
   for (let i = 1; i < deep; i++) {
     tab += '\t'
   }
-  root.left && preorder(root.left, deep + 1)
+  root.left && inorder(root.left, deep + 1)
   console.log(
     '%c' + tab + root.val,
     root.color[0] === 'R' ? 'color:red' : 'color:black'
   )
-  root.right && preorder(root.right, deep + 1)
+  root.right && inorder(root.right, deep + 1)
 }
 let arr = [2, 3, 4, 5, 6, 7, 8, 9, 10, 1]
 const tree = new RBTree(arr)
 // arr.forEach(v => {
 //   console.log(`------插入数据${v}------`)
 //   tree.insert(v)
-//   preorder(tree.root)
+//   inorder(tree.root)
 //   console.log('--------------------')
 // })
 // const n = tree.remove(8)
 
 // console.log(n)
-// preorder(tree.root)
-let node4 = tree.findNode(4)
-let s = tree.sucessor(node4)
-console.log(s)
+// inorder(tree.root)
+// let node4 = tree.findNode(4)
+// let s = tree.sucessor(node4)
+
+// 测试删除
+inorder(tree.root)
+tree.remove(5)
+inorder(tree.root)
+tree.remove(6)
+inorder(tree.root)
+tree.remove(7)
+inorder(tree.root)
+tree.remove(8)
+inorder(tree.root)
+tree.remove(9)
+inorder(tree.root)
