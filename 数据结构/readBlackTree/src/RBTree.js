@@ -464,16 +464,17 @@ class RBTree {
   }
   /**
    * 删除时调整树结构
+   * @author ywanzhou
    * @param {RBNode} x
    */
   #fixAfterDeleteNode(x) {
     // 1. 如果 x 节点不是根节点且颜色时黑色
     while (x !== this.root && this.#getColor(x) === BLACK) {
-      // x 是左孩子，也就是使用前驱节点替换
-      if (x == this.#getLeft(this.#getParent(x))) {
-        // 1.1 寻找兄弟节点
+      // x 是左孩子
+      if (x === this.#getLeft(this.#getParent(x))) {
+        // 1.1 寻找兄弟节点 对应图 删除-02
         let rNode = this.#getRight(this.#getParent(x))
-        // 1.1.1 如果兄弟节点为红色，则说明它不是真正的兄弟节点
+        // 1.1.1 如果兄弟节点为红色，则说明它不是真正的兄弟节点 对应图 删除-03
         if (this.#getColor(rNode) === RED) {
           // 1.1.2 将该节点染黑 父节点染红
           this.#setColor(rNode, BLACK)
@@ -489,6 +490,7 @@ class RBTree {
           // 1.2.1 判断是否存在左子树，如果存在则变色旋转
           // 1.2.1.1 因为进入这个说明左右子树必须存在一个，如果右子树不存在则说明左子树一定存在
           if (this.#getRight(rNode) === null) {
+            // 对应图 删除-05
             // 1.2.1.2 说明存在，先将左子树变黑
             this.#setColor(this.#getLeft(rNode), BLACK)
             // 1.2.1.3 将原本的黑色节点变红
@@ -498,6 +500,7 @@ class RBTree {
             // 1.2.1.5 调整rNode
             rNode = this.#getRight(this.#getParent(x))
           }
+          // 对应图 删除-04
           // 1.2.2 将兄弟节点变成父亲的颜色
           this.#setColor(rNode, this.#getColor(this.#getParent(x)))
           // 1.2.3 将父节点变成黑色
@@ -510,6 +513,7 @@ class RBTree {
           break
         }
         // 1.3 x 节点转换为2-3-4树，对应的兄弟节点为2节点
+        // 对应图 删除-06
         else {
           // 1.3.1 将兄弟节点变成红色
           this.#setColor(rNode, RED)
@@ -518,7 +522,7 @@ class RBTree {
           // 1.3.3 如果 x 的节点不为黑色，则不会进入循环，而是执行 2 将其变成黑色，然后黑色继续保存平衡
         }
       }
-      // x 是右孩子，也就是使用后继节点替换
+      // x 是右孩子
       else {
         // 代码与上面一致，只是方向换了一下，为了兼容前驱和后继节点
         let lNode = this.#getLeft(this.#getParent(x))
@@ -546,7 +550,8 @@ class RBTree {
         }
       }
     }
-    // 2. 替换节点为x，也就是 deleteNode 中的 2.4.1 中的调用
+    // 2. 因为要替换的节点一定是需要转换成黑色的，因为删除红色节点不会违反红黑树的平衡，所以不需要调整，凡是要调整的绝对是删除黑色节点需要补充黑色节点
+    // 对应图 删除-01
     this.#setColor(x, BLACK)
   }
 }
